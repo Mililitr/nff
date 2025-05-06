@@ -32,8 +32,8 @@
 1. **Клонирование репозитория** (или скачайте ZIP-архив)
 
 ```bash
-git clone https://github.com/yourusername/cashflow-management.git
-cd cashflow-management
+https://github.com/Mililitr/nff.git
+cd nff
 ```
 
 2. **Создание виртуального окружения**
@@ -143,7 +143,3 @@ cashflow_project/          # Корневая директория проект�
 ## Лицензия
 
 MIT License
-
-## Автор
-
-Ваше имя - [ваш email](mailto:your.email@example.com)
