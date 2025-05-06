@@ -1,0 +1,34 @@
+{% extends 'cashflow/base.html' %}
+
+{% block title %}Удаление статуса{% endblock %}
+
+{% block page_title %}Удаление статуса{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'status_list' %}" class="btn btn-sm btn-secondary">
+    <i class="fas fa-arrow-left me-1"></i>Вернуться к списку
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="alert alert-danger">
+            <h4 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Внимание!</h4>
+            <p>Вы собираетесь удалить статус <strong>"{{ object.name }}"</strong>.</p>
+            <hr>
+            <p class="mb-0">Если этот статус используется в записях о движении денежных средств, удаление может привести к ошибкам. Рекомендуется сначала удалить или изменить все связанные записи.</p>
+        </div>
+        
+        <p class="text-danger">Это действие нельзя будет отменить. Вы уверены, что хотите удалить этот статус?</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'status_list' %}" class="btn btn-secondary me-md-2">Отмена</a>
+                <button type="submit" class="btn btn-danger">Удалить</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,141 @@
+[
+  {
+    "model": "cashflow.status",
+    "pk": 1,
+    "fields": {
+      "name": "Бизнес"
+    }
+  },
+  {
+    "model": "cashflow.status",
+    "pk": 2,
+    "fields": {
+      "name": "Личное"
+    }
+  },
+  {
+    "model": "cashflow.status",
+    "pk": 3,
+    "fields": {
+      "name": "Налог"
+    }
+  },
+  {
+    "model": "cashflow.type",
+    "pk": 1,
+    "fields": {
+      "name": "Пополнение"
+    }
+  },
+  {
+    "model": "cashflow.type",
+    "pk": 2,
+    "fields": {
+      "name": "Списание"
+    }
+  },
+  {
+    "model": "cashflow.category",
+    "pk": 1,
+    "fields": {
+      "name": "Зарплата",
+      "type": 1
+    }
+  },
+  {
+    "model": "cashflow.category",
+    "pk": 2,
+    "fields": {
+      "name": "Инвестиции",
+      "type": 1
+    }
+  },
+  {
+    "model": "cashflow.category",
+    "pk": 3,
+    "fields": {
+      "name": "Инфраструктура",
+      "type": 2
+    }
+  },
+  {
+    "model": "cashflow.category",
+    "pk": 4,
+    "fields": {
+      "name": "Маркетинг",
+      "type": 2
+    }
+  },
+  {
+    "model": "cashflow.category",
+    "pk": 5,
+    "fields": {
+      "name": "Налоги",
+      "type": 2
+    }
+  },
+  {
+    "model": "cashflow.subcategory",
+    "pk": 1,
+    "fields": {
+      "name": "Основная работа",
+      "category": 1
+    }
+  },
+  {
+    "model": "cashflow.subcategory",
+    "pk": 2,
+    "fields": {
+      "name": "Фриланс",
+      "category": 1
+    }
+  },
+  {
+    "model": "cashflow.subcategory",
+    "pk": 3,
+    "fields": {
+      "name": "Дивиденды",
+      "category": 2
+    }
+  },
+  {
+    "model": "cashflow.subcategory",
+    "pk": 4,
+    "fields": {
+      "name": "VPS",
+      "category": 3
+    }
+  },
+  {
+    "model": "cashflow.subcategory",
+    "pk": 5,
+    "fields": {
+      "name": "Proxy",
+      "category": 3
+    }
+  },
+  {
+    "model": "cashflow.subcategory",
+    "pk": 6,
+    "fields": {
+      "name": "Реклама",
+      "category": 4
+    }
+  },
+  {
+    "model": "cashflow.subcategory",
+    "pk": 7,
+    "fields": {
+      "name": "НДФЛ",
+      "category": 5
+    }
+  },
+  {
+    "model": "cashflow.subcategory",
+    "pk": 8,
+    "fields": {
+      "name": "НДС",
+      "category": 5
+    }
+  }
+]

@@ -1,0 +1,73 @@
+{% extends 'cashflow/base.html' %}
+
+{% block title %}Удаление записи{% endblock %}
+
+{% block page_title %}Удаление записи{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'cashflow_list' %}" class="btn btn-sm btn-secondary">
+    <i class="fas fa-arrow-left me-1"></i>Вернуться к списку
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="alert alert-danger">
+            <h4 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Внимание!</h4>
+            <p>Вы собираетесь удалить следующую запись:</p>
+        </div>
+        
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered">
+                <tr>
+                    <th style="width: 20%">Дата</th>
+                    <td>{{ object.date|date:"d.m.Y" }}</td>
+                </tr>
+                <tr>
+                    <th>Статус</th>
+                    <td>{{ object.status }}</td>
+                </tr>
+                <tr>
+                    <th>Тип</th>
+                    <td>
+                        {% if object.type.name == 'Пополнение' %}
+                        <span class="badge bg-success">{{ object.type }}</span>
+                        {% else %}
+                        <span class="badge bg-danger">{{ object.type }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Категория</th>
+                    <td>{{ object.category }}</td>
+                </tr>
+                <tr>
+                    <th>Подкатегория</th>
+                    <td>{{ object.subcategory }}</td>
+                </tr>
+                <tr>
+                    <th>Сумма</th>
+                    <td class="{% if object.type.name == 'Пополнение' %}income{% else %}expense{% endif %}">
+                        {{ object.amount|floatformat:2 }} ₽
+                    </td>
+                </tr>
+                <tr>
+                    <th>Комментарий</th>
+                    <td>{{ object.comment|default:"-" }}</td>
+                </tr>
+            </table>
+        </div>
+        
+        <p class="text-danger">Это действие нельзя будет отменить. Вы уверены, что хотите удалить эту запись?</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'cashflow_list' %}" class="btn btn-secondary me-md-2">Отмена</a>
+                <button type="submit" class="btn btn-danger">Удалить</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

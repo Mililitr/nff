@@ -1,0 +1,258 @@
+{% extends 'cashflow/base.html' %}
+
+{% block title %}Записи движения денежных средств{% endblock %}
+
+{% block page_title %}Записи движения денежных средств{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'cashflow_create' %}" class="btn btn-sm btn-primary">
+    <i class="fas fa-plus me-1"></i>Добавить запись
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Сводная информация -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="summary-box">
+            <h5>Пополнения</h5>
+            <h3 class="income">{{ income_sum|floatformat:2 }} ₽</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="summary-box">
+            <h5>Списания</h5>
+            <h3 class="expense">{{ expense_sum|floatformat:2 }} ₽</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="summary-box">
+            <h5>Баланс</h5>
+            <h3 class="balance {% if balance >= 0 %}income{% else %}expense{% endif %}">
+                {{ balance|floatformat:2 }} ₽
+            </h3>
+        </div>
+    </div>
+</div>
+
+<!-- Фильтры -->
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">
+            <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                <i class="fas fa-filter me-1"></i>Фильтры
+            </button>
+        </h5>
+    </div>
+    <div class="collapse show" id="filterCollapse">
+        <div class="card-body">
+            <form method="get" id="filter-form">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="{{ filter_form.date_from.id_for_label }}" class="form-label">{{ filter_form.date_from.label }}</label>
+                        {{ filter_form.date_from }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="{{ filter_form.date_to.id_for_label }}" class="form-label">{{ filter_form.date_to.label }}</label>
+                        {{ filter_form.date_to }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="{{ filter_form.status.id_for_label }}" class="form-label">{{ filter_form.status.label }}</label>
+                        {{ filter_form.status }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="{{ filter_form.type.id_for_label }}" class="form-label">{{ filter_form.type.label }}</label>
+                        {{ filter_form.type }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="{{ filter_form.category.id_for_label }}" class="form-label">{{ filter_form.category.label }}</label>
+                        {{ filter_form.category }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="{{ filter_form.subcategory.id_for_label }}" class="form-label">{{ filter_form.subcategory.label }}</label>
+                        {{ filter_form.subcategory }}
+                    </div>
+                    <div class="col-md-6 mb-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-search me-1"></i>Применить
+                        </button>
+                        <a href="{% url 'cashflow_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-undo me-1"></i>Сбросить
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Таблица записей -->
+<div class="card">
+    <div class="card-body">
+        {% if cashflows %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Статус</th>
+                        <th>Тип</th>
+                        <th>Категория</th>
+                        <th>Подкатегория</th>
+                        <th>Сумма</th>
+                        <th>Комментарий</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cashflow in cashflows %}
+                    <tr>
+                        <td>{{ cashflow.date|date:"d.m.Y" }}</td>
+                        <td>{{ cashflow.status }}</td>
+                        <td>
+                            {% if cashflow.type.name == 'Пополнение' %}
+                            <span class="badge bg-success">{{ cashflow.type }}</span>
+                            {% else %}
+                            <span class="badge bg-danger">{{ cashflow.type }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ cashflow.category }}</td>
+                        <td>{{ cashflow.subcategory }}</td>
+                        <td class="{% if cashflow.type.name == 'Пополнение' %}income{% else %}expense{% endif %}">
+                            {{ cashflow.amount|floatformat:2 }} ₽
+                        </td>
+                        <td>{{ cashflow.comment|default:"-"|truncatechars:30 }}</td>
+                        <td>
+                            <a href="{% url 'cashflow_update' cashflow.id %}" class="btn btn-sm btn-outline-primary btn-action">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'cashflow_delete' cashflow.id %}" class="btn btn-sm btn-outline-danger btn-action">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Пагинация -->
+        {% if is_paginated %}
+        <nav aria-label="Навигация по страницам">
+            <ul class="pagination justify-content-center mt-4">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Первая">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Предыдущая">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Следующая">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Последняя">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>Записи не найдены. Попробуйте изменить параметры фильтрации или <a href="{% url 'cashflow_create' %}">добавьте новую запись</a>.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Обработка изменения типа для фильтрации категорий
+        $('#{{ filter_form.type.id_for_label }}').change(function() {
+            var typeId = $(this).val();
+            var categorySelect = $('#{{ filter_form.category.id_for_label }}');
+            var subcategorySelect = $('#{{ filter_form.subcategory.id_for_label }}');
+            
+            // Сбрасываем подкатегории
+            subcategorySelect.empty();
+            subcategorySelect.append('<option value="">---------</option>');
+            
+            if (typeId) {
+                // Загружаем категории для выбранного типа
+                $.ajax({
+                    url: '{% url "get_categories_by_type" %}',
+                    data: {
+                        'type_id': typeId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        categorySelect.empty();
+                        categorySelect.append('<option value="">---------</option>');
+                        $.each(data, function(index, category) {
+                            categorySelect.append('<option value="' + category.id + '">' + category.name + '</option>');
+                        });
+                    }
+                });
+            } else {
+                // Если тип не выбран, очищаем категории
+                categorySelect.empty();
+                categorySelect.append('<option value="">---------</option>');
+            }
+        });
+        
+        // Обработка изменения категории для фильтрации подкатегорий
+        $('#{{ filter_form.category.id_for_label }}').change(function() {
+            var categoryId = $(this).val();
+            var subcategorySelect = $('#{{ filter_form.subcategory.id_for_label }}');
+            
+            if (categoryId) {
+                // Загружаем подкатегории для выбранной категории
+                $.ajax({
+                    url: '{% url "get_subcategories_by_category" %}',
+                    data: {
+                        'category_id': categoryId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        subcategorySelect.empty();
+                        subcategorySelect.append('<option value="">---------</option>');
+                        $.each(data, function(index, subcategory) {
+                            subcategorySelect.append('<option value="' + subcategory.id + '">' + subcategory.name + '</option>');
+                        });
+                    }
+                });
+            } else {
+                // Если категория не выбрана, очищаем подкатегории
+                subcategorySelect.empty();
+                subcategorySelect.append('<option value="">---------</option>');
+            }
+        });
+    });
+</script>
+{% endblock %}

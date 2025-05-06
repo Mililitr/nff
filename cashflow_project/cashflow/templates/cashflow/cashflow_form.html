@@ -1,0 +1,210 @@
+{% extends 'cashflow/base.html' %}
+
+{% block title %}
+    {% if form.instance.pk %}Редактирование записи{% else %}Добавление новой записи{% endif %}
+{% endblock %}
+
+{% block page_title %}
+    {% if form.instance.pk %}Редактирование записи{% else %}Добавление новой записи{% endif %}
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'cashflow_list' %}" class="btn btn-sm btn-secondary">
+    <i class="fas fa-arrow-left me-1"></i>Вернуться к списку
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="post" id="cashflow-form">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <strong>Ошибка!</strong> Пожалуйста, исправьте следующие ошибки:
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                        <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.date.id_for_label }}" class="form-label">{{ form.date.label }}</label>
+                    {{ form.date }}
+                    {% if form.date.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.date.errors %}{{ error }}{% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }}</label>
+                    {{ form.status }}
+                    {% if form.status.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.status.errors %}{{ error }}{% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.type.id_for_label }}" class="form-label">{{ form.type.label }}</label>
+                    {{ form.type }}
+                    {% if form.type.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.type.errors %}{{ error }}{% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.category.id_for_label }}" class="form-label">{{ form.category.label }}</label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.category.errors %}{{ error }}{% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.subcategory.id_for_label }}" class="form-label">{{ form.subcategory.label }}</label>
+                    {{ form.subcategory }}
+                    {% if form.subcategory.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.subcategory.errors %}{{ error }}{% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.amount.id_for_label }}" class="form-label">{{ form.amount.label }}</label>
+                    <div class="input-group">
+                        {{ form.amount }}
+                        <span class="input-group-text">₽</span>
+                    </div>
+                    {% if form.amount.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.amount.errors %}{{ error }}{% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.comment.id_for_label }}" class="form-label">{{ form.comment.label }}</label>
+                    {{ form.comment }}
+                    {% if form.comment.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.comment.errors %}{{ error }}{% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'cashflow_list' %}" class="btn btn-secondary me-md-2">Отмена</a>
+                <button type="submit" class="btn btn-primary">
+                    {% if form.instance.pk %}Сохранить изменения{% else %}Создать запись{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Сохраняем значения из формы для использования в JavaScript
+        var formCategoryValue = "{{ form.category.value|default:'' }}";
+        var formSubcategoryValue = "{{ form.subcategory.value|default:'' }}";
+        
+        // Функция для загрузки категорий по выбранному типу
+        function loadCategories(typeId) {
+            if (typeId) {
+                $.ajax({
+                    url: '{% url "get_categories_by_type" %}',
+                    data: {
+                        'type_id': typeId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        var categorySelect = $('#{{ form.category.id_for_label }}');
+                        categorySelect.empty();
+                        categorySelect.append('<option value="">---------</option>');
+                        $.each(data, function(index, category) {
+                            categorySelect.append('<option value="' + category.id + '">' + category.name + '</option>');
+                        });
+                        
+                        // Если есть предварительно выбранная категория, выбираем ее
+                        if (formCategoryValue) {
+                            categorySelect.val(formCategoryValue);
+                            // И загружаем соответствующие подкатегории
+                            loadSubcategories(formCategoryValue);
+                        }
+                    }
+                });
+            } else {
+                // Если тип не выбран, очищаем категории и подкатегории
+                $('#{{ form.category.id_for_label }}').empty().append('<option value="">---------</option>');
+                $('#{{ form.subcategory.id_for_label }}').empty().append('<option value="">---------</option>');
+            }
+        }
+        
+        // Функция для загрузки подкатегорий по выбранной категории
+        function loadSubcategories(categoryId) {
+            if (categoryId) {
+                $.ajax({
+                    url: '{% url "get_subcategories_by_category" %}',
+                    data: {
+                        'category_id': categoryId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        var subcategorySelect = $('#{{ form.subcategory.id_for_label }}');
+                        subcategorySelect.empty();
+                        subcategorySelect.append('<option value="">---------</option>');
+                        $.each(data, function(index, subcategory) {
+                            subcategorySelect.append('<option value="' + subcategory.id + '">' + subcategory.name + '</option>');
+                        });
+                        
+                        // Если есть предварительно выбранная подкатегория, выбираем ее
+                        if (formSubcategoryValue) {
+                            subcategorySelect.val(formSubcategoryValue);
+                        }
+                    }
+                });
+            } else {
+                // Если категория не выбрана, очищаем подкатегории
+                $('#{{ form.subcategory.id_for_label }}').empty().append('<option value="">---------</option>');
+            }
+        }
+        
+        // Обработка изменения типа
+        $('#{{ form.type.id_for_label }}').change(function() {
+            loadCategories($(this).val());
+        });
+        
+        // Обработка изменения категории
+        $('#{{ form.category.id_for_label }}').change(function() {
+            loadSubcategories($(this).val());
+        });
+        
+        // Инициализация при загрузке страницы - загружаем категории для выбранного типа
+        var initialTypeId = $('#{{ form.type.id_for_label }}').val();
+        if (initialTypeId) {
+            loadCategories(initialTypeId);
+        }
+    });
+</script>
+{% endblock %}

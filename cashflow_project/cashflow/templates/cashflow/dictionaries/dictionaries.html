@@ -1,0 +1,95 @@
+{% extends 'cashflow/base.html' %}
+
+{% block title %}Управление справочниками{% endblock %}
+
+{% block page_title %}Управление справочниками{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Статусы -->
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-tag me-2"></i>Статусы</h5>
+            </div>
+            <div class="card-body">
+                <p>Управление статусами движения денежных средств (Бизнес, Личное, Налог и т.д.)</p>
+            </div>
+            <div class="card-footer bg-light">
+                <a href="{% url 'status_list' %}" class="btn btn-primary w-100">
+                    <i class="fas fa-list me-1"></i>Перейти к списку
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Типы -->
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-exchange-alt me-2"></i>Типы</h5>
+            </div>
+            <div class="card-body">
+                <p>Управление типами движения денежных средств (Пополнение, Списание)</p>
+            </div>
+            <div class="card-footer bg-light">
+                <a href="{% url 'type_list' %}" class="btn btn-success w-100">
+                    <i class="fas fa-list me-1"></i>Перейти к списку
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Категории -->
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-folder me-2"></i>Категории</h5>
+            </div>
+            <div class="card-body">
+                <p>Управление категориями движения денежных средств (Инфраструктура, Маркетинг и т.д.)</p>
+            </div>
+            <div class="card-footer bg-light">
+                <a href="{% url 'category_list' %}" class="btn btn-info w-100">
+                    <i class="fas fa-list me-1"></i>Перейти к списку
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Подкатегории -->
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-folder-open me-2"></i>Подкатегории</h5>
+            </div>
+            <div class="card-body">
+                <p>Управление подкатегориями движения денежных средств (VPS, Proxy и т.д.)</p>
+            </div>
+            <div class="card-footer bg-light">
+                <a href="{% url 'subcategory_list' %}" class="btn btn-warning w-100">
+                    <i class="fas fa-list me-1"></i>Перейти к списку
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Информация о справочниках</h5>
+    </div>
+    <div class="card-body">
+        <p>Справочники используются для классификации записей о движении денежных средств. Между справочниками существуют следующие зависимости:</p>
+        
+        <ul>
+            <li><strong>Категории</strong> связаны с <strong>Типами</strong> (например, категория "Маркетинг" относится к типу "Списание")</li>
+            <li><strong>Подкатегории</strong> связаны с <strong>Категориями</strong> (например, подкатегория "VPS" относится к категории "Инфраструктура")</li>
+        </ul>
+        
+        <div class="alert alert-info">
+            <i class="fas fa-lightbulb me-2"></i>Совет: Сначала создайте все необходимые статусы и типы, затем добавьте категории, и только после этого - подкатегории.
+        </div>
+    </div>
+</div>
+{% endblock %}
